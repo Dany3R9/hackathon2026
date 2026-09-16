@@ -417,6 +417,17 @@ body.adding .leaflet-container { cursor: crosshair; }
 .disc-sec:last-child { margin-bottom: 4px; }
 .disc-sec h3 { font-size: 13.5px; margin-bottom: 4px; display: flex; align-items: center; gap: 7px; }
 .disc-sec .hint { font-size: 12px; color: var(--cp-text-muted); margin-bottom: 10px; line-height: 1.45; }
+.persona-picker { margin: 10px 0 12px; }
+.persona-label { display: block; margin-bottom: 6px; color: var(--cp-text-muted); font-size: 11px; font-weight: 700; text-transform: uppercase; }
+.persona-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 5px; }
+.persona-option {
+  min-width: 0; padding: 7px 4px; border: 1px solid var(--cp-border); border-radius: 8px;
+  background: var(--cp-surface); color: var(--cp-text-muted); font-size: 10.5px; font-weight: 700;
+}
+.persona-option span { display: block; margin-bottom: 2px; font-size: 17px; }
+.persona-option:hover { border-color: var(--cp-accent); color: var(--cp-accent); }
+.persona-option:focus-visible { outline: 2px solid var(--cp-accent); outline-offset: 2px; }
+.persona-option.on { border-color: var(--cp-accent); background: var(--cp-accent-soft); color: var(--cp-accent); }
 .sug-list { display: flex; flex-direction: column; gap: 9px; }
 .sug-card { display: flex; gap: 10px; padding: 10px 11px; border: 1px solid var(--cp-border);
   border-radius: 12px; background: var(--cp-bg-elevated); }
@@ -543,6 +554,10 @@ body.adding .leaflet-container { cursor: crosshair; }
       <div class="disc-sec">
         <h3>🧭 Suggested next stops</h3>
         <div class="hint" id="discHint">Iconic spots you haven't logged yet — picked to grow your county map.</div>
+        <div class="persona-picker">
+          <span class="persona-label">Travel persona</span>
+          <div class="persona-options" id="personaSelector" role="group" aria-label="Travel persona"></div>
+        </div>
         <div class="sug-list" id="sugList"></div>
         <div class="sug-actions" style="margin-top:10px;">
           <button class="qlink" id="sugShuffle">🔀 Shuffle ideas</button>
@@ -670,34 +685,41 @@ const ACCESS = {
   limited: { icon: "♿", label: "Partly accessible",  cls: "acc-limited" },
   none:    { icon: "⚠️", label: "Not accessible",     cls: "acc-none" }
 };
+const PERSONAS = {
+  explorer:    { emoji: "🧭", label: "Explorer", categories: [], hint: "A balanced mix of iconic places, new counties and your past favourites." },
+  foodie:      { emoji: "🍽️", label: "Foodie", categories: ["food"], hint: "Markets, pubs and food destinations worth planning a trip around." },
+  swimmer:     { emoji: "🏊", label: "Swimmer", categories: ["coast"], hint: "Great beaches, sea pools and public swimming spots around Ireland." },
+  hiker:       { emoji: "🥾", label: "Hiker", categories: ["hike", "nature"], hint: "Mountain routes, forest trails and rewarding coastal walks." },
+  photographer:{ emoji: "📷", label: "Photographer", categories: ["nature", "coast"], hint: "Wildlife and seasonal natural phenomena with memorable views." }
+};
 
 /* Curated iconic spots spanning all four provinces (incl. the six NI counties),
    chosen to help the user progress toward all 32 counties. County is derived at
    runtime from the same detector the app uses, so labels always match the map. */
 const SUGGESTIONS = [
   { name: "Trinity College & Book of Kells", lat: 53.3438, lng: -6.2546, category: "historic", blurb: "Ireland's oldest university and the dazzling 9th-century Book of Kells." },
-  { name: "Glendalough", lat: 53.0106, lng: -6.3269, category: "nature", blurb: "Two glacial lakes and a 6th-century monastic city in the Wicklow Mountains." },
-  { name: "Newgrange", lat: 53.6947, lng: -6.4755, category: "historic", blurb: "A 5,000-year-old passage tomb, older than the pyramids, aligned to the winter solstice." },
+  { name: "Glendalough", lat: 53.0106, lng: -6.3269, category: "nature", personas: ["hiker", "photographer"], blurb: "Two glacial lakes and a 6th-century monastic city in the Wicklow Mountains." },
+  { name: "Newgrange", lat: 53.6947, lng: -6.4755, category: "historic", personas: ["photographer"], blurb: "A 5,000-year-old passage tomb, older than the pyramids, aligned to the winter solstice." },
   { name: "Blarney Castle", lat: 51.9290, lng: -8.5705, category: "castle", blurb: "Kiss the Blarney Stone for the gift of the gab; superb poison garden too." },
-  { name: "Killarney National Park", lat: 52.0000, lng: -9.5500, category: "nature", blurb: "Lakes, oak woods and Torc Waterfall beneath Kerry's highest peaks." },
-  { name: "Dingle Peninsula", lat: 52.1409, lng: -10.2668, category: "coast", blurb: "Slea Head Drive, beehive huts and a famously friendly harbour town." },
-  { name: "The Burren", lat: 53.0500, lng: -9.0000, category: "nature", blurb: "A lunar limestone landscape hiding rare Arctic-alpine wildflowers." },
+  { name: "Killarney National Park", lat: 52.0000, lng: -9.5500, category: "nature", personas: ["hiker", "photographer"], blurb: "Lakes, oak woods and Torc Waterfall beneath Kerry's highest peaks." },
+  { name: "Dingle Peninsula", lat: 52.1409, lng: -10.2668, category: "coast", personas: ["photographer"], blurb: "Slea Head Drive, beehive huts and seasonal dolphin watching from a famously friendly harbour town." },
+  { name: "The Burren", lat: 53.0500, lng: -9.0000, category: "nature", personas: ["hiker", "photographer"], blurb: "A lunar limestone landscape hiding rare Arctic-alpine wildflowers in late spring." },
   { name: "Bunratty Castle & Folk Park", lat: 52.6994, lng: -8.8100, category: "castle", blurb: "A restored medieval tower house with a living 19th-century village." },
   { name: "King John's Castle", lat: 52.6698, lng: -8.6259, category: "castle", blurb: "An 800-year-old Norman fortress on the banks of the Shannon in Limerick." },
   { name: "Kylemore Abbey", lat: 53.5605, lng: -9.8890, category: "historic", blurb: "A romantic lakeside Victorian castle and walled garden in Connemara." },
-  { name: "Croagh Patrick", lat: 53.7599, lng: -9.6592, category: "hike", blurb: "Ireland's holy mountain — a stiff climb rewarded with Clew Bay views." },
-  { name: "Achill Island", lat: 53.9633, lng: -10.0000, category: "coast", blurb: "Blue-flag beaches, sea cliffs and the deserted village under Slievemore." },
-  { name: "Benbulben", lat: 54.3689, lng: -8.4700, category: "nature", blurb: "Sligo's flat-topped 'table mountain' and the heart of Yeats country." },
+  { name: "Croagh Patrick", lat: 53.7599, lng: -9.6592, category: "hike", personas: ["hiker"], blurb: "Ireland's holy mountain — a stiff climb rewarded with Clew Bay views." },
+  { name: "Achill Island", lat: 53.9633, lng: -10.0000, category: "coast", personas: ["swimmer", "photographer"], blurb: "Blue-flag beaches, sea cliffs and the deserted village under Slievemore." },
+  { name: "Benbulben", lat: 54.3689, lng: -8.4700, category: "nature", personas: ["hiker", "photographer"], blurb: "Sligo's flat-topped 'table mountain' and the heart of Yeats country." },
   { name: "Slieve League Cliffs", lat: 54.6386, lng: -8.6870, category: "coast", blurb: "Among Europe's highest sea cliffs — nearly three times the height of Moher." },
-  { name: "Glenveagh National Park", lat: 55.0350, lng: -8.0000, category: "nature", blurb: "Wild Donegal glens, a fairytale castle and roaming red deer." },
+  { name: "Glenveagh National Park", lat: 55.0350, lng: -8.0000, category: "nature", personas: ["hiker", "photographer"], blurb: "Wild Donegal glens, a fairytale castle and roaming red deer." },
   { name: "Titanic Belfast", lat: 54.6079, lng: -5.9106, category: "historic", blurb: "Award-winning museum where the Titanic was designed and built." },
   { name: "The Dark Hedges", lat: 55.1349, lng: -6.3814, category: "nature", blurb: "The haunting beech avenue made famous by Game of Thrones." },
   { name: "Derry City Walls", lat: 54.9958, lng: -7.3211, category: "historic", blurb: "Walk the only completely intact walled city in Ireland." },
-  { name: "Mourne Mountains", lat: 54.1800, lng: -6.0700, category: "hike", blurb: "Granite peaks that 'sweep down to the sea' and inspired Narnia." },
+  { name: "Mourne Mountains", lat: 54.1800, lng: -6.0700, category: "hike", personas: ["hiker"], blurb: "Granite peaks that 'sweep down to the sea' and inspired Narnia." },
   { name: "Marble Arch Caves", lat: 54.2600, lng: -7.8100, category: "nature", blurb: "A show-cave river journey beneath the Fermanagh hills." },
   { name: "Hook Lighthouse", lat: 52.1233, lng: -6.9283, category: "coast", blurb: "One of the world's oldest working lighthouses, 800 years and counting." },
   { name: "Birr Castle & Gardens", lat: 53.0969, lng: -7.9140, category: "castle", blurb: "Demesne science museum, home to the once-largest telescope on Earth." },
-  { name: "English Market", lat: 51.8979, lng: -8.4750, category: "food", blurb: "Cork's roofed Victorian food market — spiced beef, buttered eggs and more." },
+  { name: "English Market", lat: 51.8979, lng: -8.4750, category: "food", personas: ["foodie"], blurb: "Cork's roofed Victorian food market — spiced beef, buttered eggs and more." },
   { name: "Rock of Dunamase", lat: 53.0300, lng: -7.2100, category: "historic", blurb: "A dramatic ruined hilltop fortress with sweeping Laois views." },
   { name: "Brownshill Dolmen", lat: 52.8360, lng: -6.8880, category: "historic", blurb: "A portal tomb whose capstone is the heaviest in Europe." },
   { name: "Rossmore Forest Park", lat: 54.2200, lng: -6.9900, category: "nature", blurb: "Monaghan trails, giant redwoods and Victorian pleasure grounds." },
@@ -706,7 +728,22 @@ const SUGGESTIONS = [
   { name: "Waterford Viking Triangle", lat: 52.2593, lng: -7.1101, category: "historic", blurb: "Ireland's oldest city, founded by Vikings in 914 AD." },
   { name: "Carlingford", lat: 54.0400, lng: -6.1870, category: "coast", blurb: "A medieval village on the lough between mountain and sea in Louth." },
   { name: "Irish National Stud & Gardens", lat: 53.1580, lng: -6.8300, category: "nature", blurb: "Kildare's famous thoroughbreds beside serene Japanese Gardens." },
-  { name: "Belvedere House & Gardens", lat: 53.4770, lng: -7.3560, category: "historic", blurb: "A Georgian villa, folly-filled parkland and the 'Jealous Wall'." }
+  { name: "Belvedere House & Gardens", lat: 53.4770, lng: -7.3560, category: "historic", blurb: "A Georgian villa, folly-filled parkland and the 'Jealous Wall'." },
+  { name: "Kinsale Food Trail", lat: 51.7061, lng: -8.5225, category: "food", personas: ["foodie"], blurb: "Harbour restaurants, seafood and artisan producers in Ireland's celebrated gourmet town." },
+  { name: "Galway Market", lat: 53.2728, lng: -9.0538, category: "food", personas: ["foodie"], blurb: "Weekend stalls beside St Nicholas' Church serving oysters, pastries and local produce." },
+  { name: "St George's Market", lat: 54.5954, lng: -5.9288, category: "food", personas: ["foodie"], blurb: "A grand Belfast market packed with local food, crafts and live music at weekends." },
+  { name: "Dingle Food Trail", lat: 52.1409, lng: -10.2687, category: "food", personas: ["foodie"], blurb: "Seafood, farmhouse cheese, ice cream and lively pubs around Dingle harbour." },
+  { name: "The Crown Liquor Saloon", lat: 54.5930, lng: -5.9342, category: "food", personas: ["foodie"], blurb: "A landmark Victorian Belfast pub with ornate snugs and traditional plates." },
+  { name: "Doolin Traditional Pubs", lat: 53.0168, lng: -9.3776, category: "food", personas: ["foodie"], blurb: "Traditional music sessions, seafood and welcoming pubs in a small village on the Wild Atlantic Way." },
+  { name: "Forty Foot", lat: 53.2885, lng: -6.1133, category: "coast", personas: ["swimmer"], blurb: "Dublin's famous year-round sea-swimming spot beside Sandycove; check conditions before entering." },
+  { name: "Salthill Diving Tower", lat: 53.2592, lng: -9.0807, category: "coast", personas: ["swimmer"], blurb: "A beloved Galway Bay swim with steps, changing shelters and a high-tide diving platform." },
+  { name: "Guillamene Swimming Cove", lat: 52.1548, lng: -7.1418, category: "coast", personas: ["swimmer"], blurb: "A sheltered historic sea-swimming cove near Tramore with ladders into deep water." },
+  { name: "Inchydoney Beach", lat: 51.5998, lng: -8.8655, category: "coast", personas: ["swimmer"], blurb: "A broad Blue Flag beach near Clonakilty, best enjoyed within the lifeguarded bathing area." },
+  { name: "Portstewart Strand", lat: 55.1712, lng: -6.7152, category: "coast", personas: ["swimmer"], blurb: "Two miles of golden sand backed by dunes, with seasonal lifeguard cover." },
+  { name: "Bundoran West End Pool", lat: 54.4806, lng: -8.2998, category: "coast", personas: ["swimmer"], blurb: "A natural Atlantic tidal pool popular with experienced outdoor swimmers." },
+  { name: "Great Saltee Puffin Cliffs", lat: 52.1177, lng: -6.6178, category: "nature", personas: ["photographer"], blurb: "Photograph nesting puffins and seabirds from late April to July; boat access is weather-dependent." },
+  { name: "Loop Head Dolphin Watching", lat: 52.5610, lng: -9.9320, category: "nature", personas: ["photographer"], blurb: "Seasonal boat trips into the Shannon Estuary for bottlenose dolphins and dramatic headlands." },
+  { name: "Castle Espie Winter Wildfowl", lat: 54.5181, lng: -5.6997, category: "nature", personas: ["photographer"], blurb: "Winter brings vast flocks of light-bellied brent geese to the shores of Strangford Lough." }
 ];
 
 /* Distance / geolocation */
@@ -797,6 +834,7 @@ function sharePlace(p) {
 
 /* Recommender — rank unvisited iconic spots, favouring new counties + liked categories */
 function suggestionsRanked() {
+  const persona = PERSONAS[state.persona] || PERSONAS.explorer;
   const visitedCounties = new Set(state.places.filter(p => p.county).map(p => p.county));
   const likedCats = {};
   state.places.forEach(p => { likedCats[p.category] = (likedCats[p.category] || 0) + 1; });
@@ -808,6 +846,8 @@ function suggestionsRanked() {
     .filter(s => !alreadyHave(s))
     .map(s => {
       let score = 0;
+      if (s.personas?.includes(state.persona)) score += 8;
+      else if (persona.categories.includes(s.category)) score += 3;
       if (s.county && !visitedCounties.has(s.county)) score += 3;   // grow the 32-county map
       if (likedCats[s.category]) score += Math.min(likedCats[s.category], 2); // match taste
       score += Math.random() * 0.9;                                  // gentle variety / shuffle
@@ -822,7 +862,8 @@ function buildAiPrompt() {
   const counties = [...new Set(places.filter(p => p.county).map(p => p.county))];
   const likeCounts = places.reduce((a, p) => { a[p.category] = (a[p.category] || 0) + 1; return a; }, {});
   const likes = Object.entries(likeCounts).sort((a, b) => b[1] - a[1]).map(([k]) => CATS[k]?.label || k);
-  const lines = ["I'm exploring Ireland and tracking the places I visit across the 32 counties."];
+  const persona = PERSONAS[state.persona] || PERSONAS.explorer;
+  const lines = [`My travel persona is ${persona.label}. I'm exploring Ireland and tracking the places I visit across the 32 counties.`];
   if (places.length) {
     const visited = places.map(p =>
       `- ${p.name} (${p.county || "?"}, ${CATS[p.category]?.label || p.category}${p.rating ? `, ${p.rating}★` : ""})`);
@@ -833,7 +874,7 @@ function buildAiPrompt() {
     lines.push("\nI haven't logged any places yet — assume I'm starting fresh.");
   }
   lines.push(
-    "\nPlease recommend 8 specific next places to visit, favouring counties I haven't reached yet. " +
+    `\nPlease recommend 8 specific next places for my ${persona.label.toLowerCase()} persona, favouring counties I haven't reached yet. ` +
     "For each, give: name, county, why it's worth it, a great local food or drink spot nearby, " +
     "rough opening hours, and any wheelchair-accessibility notes. Keep it practical for a self-drive trip " +
     "and mention public-transport options where they exist.");
@@ -849,7 +890,18 @@ function openDiscover() {
 }
 function closeDiscover() { document.getElementById("discModal").classList.remove("on"); }
 function renderDiscover() {
+  const persona = PERSONAS[state.persona] || PERSONAS.explorer;
   const box = document.getElementById("sugList");
+  document.getElementById("discHint").textContent = persona.hint;
+  const selector = document.getElementById("personaSelector");
+  selector.innerHTML = Object.entries(PERSONAS).map(([key, value]) =>
+    `<button type="button" class="persona-option ${state.persona === key ? "on" : ""}" data-persona="${key}" aria-pressed="${state.persona === key}" title="Show ideas for ${value.label.toLowerCase()}s"><span>${value.emoji}</span>${value.label}</button>`).join("");
+  selector.querySelectorAll(".persona-option").forEach(button => button.addEventListener("click", () => {
+    state.persona = button.dataset.persona;
+    save();
+    discoverList = suggestionsRanked().slice(0, 6);
+    renderDiscover();
+  }));
   document.getElementById("aiBox").value = buildAiPrompt();
   const visited = new Set(state.places.filter(p => p.county).map(p => p.county));
   if (!discoverList.length) {
@@ -933,7 +985,7 @@ function countyAt(lat, lng) {
 }
 
 /* ---------------- State ---------------- */
-let state = { places: [], theme: document.documentElement.getAttribute("data-theme") || "light" };
+let state = { places: [], theme: document.documentElement.getAttribute("data-theme") || "light", persona: "explorer" };
 let filter = { text: "", cats: new Set(), county: null, province: null, sort: "recent" };
 let addMode = false;
 let editingId = null;
@@ -945,6 +997,7 @@ function load() {
     const raw = JSON.parse(localStorage.getItem(STORAGE_KEY));
     if (raw && Array.isArray(raw.places)) state.places = raw.places;
     if (raw && raw.theme) state.theme = raw.theme;
+    if (raw && PERSONAS[raw.persona]) state.persona = raw.persona;
   } catch (e) {}
 }
 function save() {
