@@ -156,8 +156,16 @@ button { font-family: inherit; cursor: pointer; }
 }
 .search-box input:focus { outline: none; border-color: var(--cp-accent); }
 .search-box .ico { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); opacity: .5; font-size: 14px; }
-.chips { display: flex; gap: 6px; overflow-x: auto; padding: 10px 0 2px; scrollbar-width: none; }
-.chips::-webkit-scrollbar { display: none; }
+.chips {
+  display: flex; gap: 6px; overflow-x: auto; padding: 10px 0 8px;
+  scrollbar-width: thin; scrollbar-color: var(--cp-border-strong) transparent;
+  scrollbar-gutter: stable;
+}
+.chips::-webkit-scrollbar { height: 8px; }
+.chips::-webkit-scrollbar-thumb {
+  background: var(--cp-border-strong); border: 2px solid transparent; border-radius: 8px; background-clip: padding-box;
+}
+.chips::-webkit-scrollbar-track { background: transparent; }
 .chip {
   flex: none; border: 1px solid var(--cp-border); background: var(--cp-surface); color: var(--cp-text-muted);
   padding: 6px 11px; border-radius: 999px; font-size: 12px; font-weight: 600; transition: all .15s ease;
