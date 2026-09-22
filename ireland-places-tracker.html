@@ -144,8 +144,12 @@ button { font-family: inherit; cursor: pointer; }
 .prov-pill {
   flex: 1; text-align: center; font-size: 10.5px; font-weight: 600; padding: 5px 4px; border-radius: 8px;
   border: 1px solid var(--cp-border); color: var(--cp-text-muted); background: var(--cp-surface);
+  font-family: inherit; cursor: pointer;
 }
+.prov-pill:hover { border-color: var(--cp-accent); color: var(--cp-accent); }
+.prov-pill:focus-visible { outline: 2px solid var(--cp-accent); outline-offset: 2px; }
 .prov-pill.on { color: var(--cp-accent); border-color: var(--cp-accent); background: var(--cp-accent-soft); }
+.prov-pill.selected { color: var(--cp-accent-fg); border-color: var(--cp-accent); background: var(--cp-accent); }
 
 /* ---------- Controls ---------- */
 .controls { padding: 12px 16px 8px; border-top: 1px solid var(--cp-border); }
@@ -156,8 +160,16 @@ button { font-family: inherit; cursor: pointer; }
 }
 .search-box input:focus { outline: none; border-color: var(--cp-accent); }
 .search-box .ico { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); opacity: .5; font-size: 14px; }
-.chips { display: flex; gap: 6px; overflow-x: auto; padding: 10px 0 2px; scrollbar-width: none; }
-.chips::-webkit-scrollbar { display: none; }
+.chips {
+  display: flex; gap: 6px; overflow-x: auto; padding: 10px 0 8px;
+  scrollbar-width: thin; scrollbar-color: var(--cp-border-strong) transparent;
+  scrollbar-gutter: stable;
+}
+.chips::-webkit-scrollbar { height: 8px; }
+.chips::-webkit-scrollbar-thumb {
+  background: var(--cp-border-strong); border: 2px solid transparent; border-radius: 8px; background-clip: padding-box;
+}
+.chips::-webkit-scrollbar-track { background: transparent; }
 .chip {
   flex: none; border: 1px solid var(--cp-border); background: var(--cp-surface); color: var(--cp-text-muted);
   padding: 6px 11px; border-radius: 999px; font-size: 12px; font-weight: 600; transition: all .15s ease;
@@ -352,17 +364,25 @@ body.adding .leaflet-container { cursor: crosshair; }
 .mobile-tabs { display: none; }
 @media (max-width: 900px) {
   .app { flex-direction: column; }
-  .sidebar { width: 100%; border-right: none; border-top: 1px solid var(--cp-border); order: 2; height: 45vh; }
-  .map-wrap { order: 1; height: 55vh; flex: none; }
+  .sidebar { width: 100%; border-right: none; border-top: 1px solid var(--cp-border); order: 2; height: auto; flex: 9 1 0; }
+  .map-wrap { order: 1; height: auto; flex: 11 1 0; min-height: 0; }
   .brand p { display: none; }
   .hide-sm { display: none; }
-  .mobile-tabs { display: flex; gap: 6px; }
-  body.view-map .sidebar { display: none; }
-  body.view-map .map-wrap { height: calc(100vh - 67px); }
-  body.view-list .map-wrap { display: none; }
-  body.view-list .sidebar { height: calc(100vh - 67px); }
-  .tab-btn { border: 1px solid var(--cp-border); background: var(--cp-surface); color: var(--cp-text-muted); border-radius: 8px; padding: 8px 12px; font-size: 12.5px; font-weight: 600; }
-  .tab-btn.on { background: var(--cp-accent-soft); border-color: var(--cp-accent); color: var(--cp-accent); }
+  .mobile-tabs { display: none; }
+  body.view-map .sidebar, body.view-list .sidebar { display: flex; }
+  body.view-map .map-wrap, body.view-list .map-wrap { display: block; }
+}
+@media (max-width: 600px) {
+  .topbar { gap: 8px; padding: 10px 12px; }
+  .brand-copy { display: none; }
+  .top-actions { gap: 5px; }
+  .top-actions .btn { padding: 8px 10px; }
+  .brand-mark { width: 38px; height: 38px; border-radius: 10px; }
+  .legend { display: none; }
+}
+@media (max-width: 420px) {
+  .brand-mark { display: none; }
+  .topbar { justify-content: center; }
 }
 
 /* ---------- Whiteboard features: badges, quick links, suggestions, discover ---------- */
@@ -430,6 +450,21 @@ body.adding .leaflet-container { cursor: crosshair; }
   font-size: 11.5px; line-height: 1.45; padding: 10px 12px; border-radius: 10px;
   border: 1px solid var(--cp-border); background: var(--cp-surface-soft); color: var(--cp-text); resize: vertical; }
 .ai-actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+.planner-shell { border: 1px solid var(--cp-border); border-radius: 12px; overflow: hidden; background: var(--cp-bg-elevated); }
+.planner-chat { max-height: 300px; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+.planner-msg { max-width: 90%; padding: 8px 10px; border-radius: 10px; font-size: 12px; line-height: 1.45; }
+.planner-msg.assistant { align-self: flex-start; background: var(--cp-surface); border: 1px solid var(--cp-border); }
+.planner-msg.user { align-self: flex-end; background: var(--cp-accent); color: var(--cp-accent-fg); }
+.planner-summary { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 7px; }
+.planner-stop { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--cp-border); }
+.planner-stop:first-of-type { margin-top: 10px; }
+.planner-stop b { display: block; }
+.planner-stop small { color: var(--cp-text-muted); }
+.planner-compose { display: flex; gap: 6px; padding: 8px; border-top: 1px solid var(--cp-border); background: var(--cp-surface); }
+.planner-compose input { min-width: 0; flex: 1; padding: 9px 10px; border: 1px solid var(--cp-border); border-radius: 8px; background: var(--cp-bg-elevated); color: var(--cp-text); font: inherit; font-size: 12.5px; }
+.planner-compose input:focus { outline: 2px solid var(--cp-accent); outline-offset: -1px; }
+.planner-examples { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; padding: 8px 0 2px; }
+.planner-examples .qlink { width: 100%; min-width: 0; justify-content: flex-start; text-align: left; line-height: 1.35; }
 </style>
 </head>
 <body class="view-map">
@@ -437,7 +472,7 @@ body.adding .leaflet-container { cursor: crosshair; }
 <header class="topbar">
   <div class="brand">
     <div class="brand-mark">☘️</div>
-    <div>
+    <div class="brand-copy">
       <h1>Ireland Explorer</h1>
       <p>Track every place you visit across the 32 counties</p>
     </div>
@@ -449,8 +484,9 @@ body.adding .leaflet-container { cursor: crosshair; }
     </div>
     <button id="addBtn" class="btn btn-primary">＋ <span class="hide-sm">Add a place</span></button>
     <button id="discoverBtn" class="btn btn-ghost">✨ <span class="hide-sm">Discover</span></button>
-    <button id="importBtn" class="btn btn-ghost hide-sm">Import</button>
-    <button id="exportBtn" class="btn btn-ghost hide-sm">Export</button>
+    <button id="planBtn" class="btn btn-ghost">💬 <span class="hide-sm">Plan</span></button>
+    <button id="importBtn" class="btn btn-ghost" title="Import places" aria-label="Import places">⇧ <span class="hide-sm">Import</span></button>
+    <button id="exportBtn" class="btn btn-ghost" title="Export places" aria-label="Export places">⇩ <span class="hide-sm">Export</span></button>
     <button id="themeBtn" class="btn btn-icon" title="Toggle light / dark">🌙</button>
   </div>
 </header>
@@ -498,7 +534,7 @@ body.adding .leaflet-container { cursor: crosshair; }
           <option value="date">Date visited</option>
           <option value="name">Name A–Z</option>
           <option value="rating">Top rated</option>
-          <option value="near">Nearest first</option>
+          <option value="near">Shortest drive time</option>
           <option value="county">County</option>
         </select>
       </div>
@@ -535,11 +571,32 @@ body.adding .leaflet-container { cursor: crosshair; }
 <div class="modal-overlay discover" id="discModal">
   <div class="modal">
     <div class="modal-head">
-      <h2>✨ Discover Ireland</h2>
+      <h2 id="discTitle">✨ Discover Ireland</h2>
       <button id="discClose">×</button>
     </div>
     <div class="modal-body">
-      <div class="disc-sec">
+      <div class="disc-sec" id="plannerSection">
+        <h3>💬 Plan a trip</h3>
+        <div class="hint">Describe the day you want. The planner uses your visit history and our curated Ireland dataset; transport and accessibility details should be verified before travel.</div>
+        <div class="planner-shell">
+          <div class="planner-chat" id="plannerChat" aria-live="polite"></div>
+          <form class="planner-compose" id="plannerForm">
+            <input id="plannerInput" type="text" autocomplete="off" aria-label="Describe your trip" placeholder="e.g. Accessible day trip from Dublin for a photographer" />
+            <button class="btn btn-primary" type="submit">Plan</button>
+          </form>
+        </div>
+        <div class="planner-examples" aria-label="Example trip requests">
+          <button class="qlink planner-example">Low-carbon day trip from Dublin</button>
+          <button class="qlink planner-example">Accessible foodie weekend near Cork</button>
+          <button class="qlink planner-example">Half-day coastal photography trip</button>
+          <button class="qlink planner-example">Car-free historic day trip from Belfast</button>
+          <button class="qlink planner-example">4-hour hiking trip from Galway</button>
+          <button class="qlink planner-example">Scenic road trip from Limerick</button>
+          <button class="qlink planner-example">Accessible day trip from Waterford</button>
+          <button class="qlink planner-example">Weekend swimming trip from Cork</button>
+        </div>
+      </div>
+      <div class="disc-sec" id="discoverSection">
         <h3>🧭 Suggested next stops</h3>
         <div class="hint" id="discHint">Iconic spots you haven't logged yet — picked to grow your county map.</div>
         <div class="persona-picker">
@@ -551,7 +608,7 @@ body.adding .leaflet-container { cursor: crosshair; }
           <button class="qlink" id="sugShuffle">🔀 Shuffle ideas</button>
         </div>
       </div>
-      <div class="disc-sec">
+      <div class="disc-sec" id="aiSection">
         <h3>🤖 Ask AI for ideas</h3>
         <div class="hint">Bring your own AI — copy this prompt into Copilot, Claude or ChatGPT for tailored food, hidden-gem and accessible-route ideas based on where you've been.</div>
         <textarea class="ai-box" id="aiBox" readonly></textarea>
@@ -736,6 +793,9 @@ const SUGGESTIONS = [
 
 /* Distance / geolocation */
 let geoPos = null; // { lat, lng } once the user shares their location
+let travelById = new Map(); // OSRM road estimates keyed by saved place ID
+let travelLoading = false;
+let travelAbort = null;
 function haversineKm(aLat, aLng, bLat, bLng) {
   const R = 6371, toR = x => x * Math.PI / 180;
   const dLat = toR(bLat - aLat), dLng = toR(bLng - aLng);
@@ -746,6 +806,55 @@ function fmtDist(km) {
   if (km < 1) return Math.round(km * 1000) + " m";
   return (km < 10 ? km.toFixed(1) : Math.round(km)) + " km";
 }
+function fmtDuration(seconds) {
+  const minutes = Math.max(1, Math.round(seconds / 60));
+  if (minutes < 60) return `${minutes} min`;
+  const hours = Math.floor(minutes / 60), remainder = minutes % 60;
+  return `${hours} hr${remainder ? ` ${remainder} min` : ""}`;
+}
+function proximityBadge(place) {
+  const route = travelById.get(place.id);
+  if (route) return `<span class="badge dist" title="Estimated drive without live traffic">🚗 ${fmtDuration(route.duration)} · ${fmtDist(route.distance / 1000)}</span>`;
+  if (travelLoading) return `<span class="badge dist" title="Calculating road journey">⏳ Estimating…</span>`;
+  const direct = geoPos ? haversineKm(geoPos.lat, geoPos.lng, place.lat, place.lng) : null;
+  return direct == null ? "" : `<span class="badge dist" title="Straight-line distance; road estimate unavailable">📍 ${fmtDist(direct)} direct</span>`;
+}
+async function updateTravelTimes() {
+  if (travelAbort) travelAbort.abort();
+  travelById = new Map();
+  if (!geoPos || !state.places.length) { travelLoading = false; renderList(); return; }
+
+  const controller = new AbortController();
+  travelAbort = controller;
+  travelLoading = true;
+  renderList();
+  try {
+    for (let offset = 0; offset < state.places.length; offset += 99) {
+      const places = state.places.slice(offset, offset + 99);
+      const coords = [[geoPos.lng, geoPos.lat], ...places.map(place => [place.lng, place.lat])]
+        .map(pair => pair.join(",")).join(";");
+      const url = `https://router.project-osrm.org/table/v1/driving/${coords}?sources=0&annotations=duration,distance`;
+      const response = await fetch(url, { signal: controller.signal });
+      if (!response.ok) throw new Error("Routing unavailable");
+      const data = await response.json();
+      if (data.code !== "Ok") throw new Error(data.message || "Routing unavailable");
+      places.forEach((place, index) => {
+        const duration = data.durations?.[0]?.[index + 1];
+        const distance = data.distances?.[0]?.[index + 1];
+        if (Number.isFinite(duration) && Number.isFinite(distance)) travelById.set(place.id, { duration, distance });
+      });
+    }
+    toast(`Travel times ready for ${travelById.size} place${travelById.size === 1 ? "" : "s"}`);
+  } catch (error) {
+    if (error.name !== "AbortError") toast("Road times unavailable — using direct distance");
+  } finally {
+    if (travelAbort === controller) {
+      travelLoading = false;
+      travelAbort = null;
+      renderList();
+    }
+  }
+}
 function requestLocation(cb) {
   if (!navigator.geolocation) { toast("Location isn't available in this browser"); return; }
   toast("Locating you…");
@@ -753,7 +862,7 @@ function requestLocation(cb) {
     pos => {
       geoPos = { lat: pos.coords.latitude, lng: pos.coords.longitude };
       const b = document.getElementById("locateBtn"); if (b) b.classList.add("on");
-      renderList(); if (cb) cb();
+      renderList(); updateTravelTimes(); if (cb) cb();
       toast("Showing distances from you 📍");
     },
     () => toast("Couldn't get your location"),
@@ -762,7 +871,9 @@ function requestLocation(cb) {
 }
 function toggleLocation() {
   if (geoPos) {
+    if (travelAbort) travelAbort.abort();
     geoPos = null;
+    travelById = new Map(); travelLoading = false; travelAbort = null;
     document.getElementById("locateBtn").classList.remove("on");
     if (filter.sort === "near") { filter.sort = "recent"; document.getElementById("sortSel").value = "recent"; }
     renderList(); toast("Distances hidden");
@@ -869,14 +980,167 @@ function buildAiPrompt() {
   return lines.join("\n");
 }
 
+/* Conversational planner — private, deterministic planning over curated data */
+const PLANNER_ORIGINS = {
+  dublin: { label: "Dublin", lat: 53.3498, lng: -6.2603 },
+  belfast: { label: "Belfast", lat: 54.5973, lng: -5.9301 },
+  cork: { label: "Cork", lat: 51.8985, lng: -8.4756 },
+  galway: { label: "Galway", lat: 53.2707, lng: -9.0568 },
+  limerick: { label: "Limerick", lat: 52.6638, lng: -8.6267 },
+  waterford: { label: "Waterford", lat: 52.2593, lng: -7.1101 }
+};
+let plannerContext = { origin: null, hours: 8, persona: null, transport: "balanced", accessible: false };
+let plannerPlan = [];
+
+function parsePlannerRequest(text) {
+  const value = text.toLowerCase();
+  const next = { ...plannerContext };
+  Object.entries(PLANNER_ORIGINS).forEach(([key, origin]) => { if (value.includes(key)) next.origin = origin; });
+  Object.entries(PERSONAS).forEach(([key, persona]) => {
+    if (value.includes(key) || value.includes(persona.label.toLowerCase())) next.persona = key;
+  });
+  if (/photo|wildlife|scenic|views?/.test(value)) next.persona = "photographer";
+  if (/food|market|pub|restaurant/.test(value)) next.persona = "foodie";
+  if (/swim|beach|sea pool/.test(value)) next.persona = "swimmer";
+  if (/hik|walk|trail|mountain/.test(value)) next.persona = "hiker";
+  if (/public transport|transit|bus|train|car[ -]?free|low[ -]?carbon|sustainable/.test(value)) next.transport = "transit";
+  if (/drive|driving|car trip|road trip/.test(value)) next.transport = "drive";
+  if (/accessible|wheelchair|step[ -]?free|limited mobility/.test(value)) next.accessible = true;
+  if (/no accessibility|not accessible/.test(value)) next.accessible = false;
+  const hourMatch = value.match(/(\d{1,2})\s*-?\s*(?:hour|hr)/);
+  if (hourMatch) next.hours = Math.max(2, Math.min(48, +hourMatch[1]));
+  else if (/half(?:[ -]| a )?day/.test(value)) next.hours = 4;
+  else if (/weekend|two days|2 days/.test(value)) next.hours = 16;
+  else if (/day trip|full day|one day/.test(value)) next.hours = 8;
+  return next;
+}
+
+function buildPlannerPlan(constraints) {
+  const personaKey = constraints.persona || state.persona || "explorer";
+  const persona = PERSONAS[personaKey] || PERSONAS.explorer;
+  const visited = new Set(state.places.filter(place => place.county).map(place => place.county));
+  const maxStops = constraints.hours <= 4 ? 2 : constraints.hours >= 14 ? 4 : 3;
+  const origin = constraints.origin;
+  const radiusKm = constraints.hours <= 4 ? 55 : constraints.hours >= 14 ? 260 : constraints.transport === "transit" ? 100 : 160;
+  return SUGGESTIONS.map(place => {
+    const county = countyAt(place.lat, place.lng);
+    const distance = origin ? haversineKm(origin.lat, origin.lng, place.lat, place.lng) : null;
+    let score = 0;
+    if (!visited.has(county)) score += 5;
+    if (place.personas?.includes(personaKey)) score += 8;
+    else if (persona.categories.includes(place.category)) score += 4;
+    if (constraints.transport === "transit" && ["city", "historic", "food"].includes(place.category)) score += 2;
+    if (distance != null) score += Math.max(0, 5 - distance / (constraints.hours <= 4 ? 25 : 60));
+    return { ...place, county, distance, score };
+  }).filter(place => place.distance == null || place.distance <= radiusKm)
+    .sort((a, b) => b.score - a.score).slice(0, maxStops);
+}
+
+function plannerMessage(role, html) {
+  const chat = document.getElementById("plannerChat");
+  const message = document.createElement("div");
+  message.className = `planner-msg ${role}`;
+  message.innerHTML = html;
+  chat.appendChild(message);
+  chat.scrollTop = chat.scrollHeight;
+  return message;
+}
+
+function renderPlannerReply(constraints) {
+  const persona = PERSONAS[constraints.persona || state.persona] || PERSONAS.explorer;
+  const origin = constraints.origin?.label || "your chosen starting point";
+  const mode = constraints.transport === "transit" ? "public transport preferred" : constraints.transport === "drive" ? "driving" : "mixed transport";
+  const visited = new Set(state.places.filter(place => place.county).map(place => place.county));
+  const stops = plannerPlan.map((place, index) => {
+    const isNew = place.county && !visited.has(place.county);
+    const distance = place.distance == null ? "" : ` · ${fmtDist(place.distance)} direct from ${escapeHtml(origin)}`;
+    return `<div class="planner-stop"><b>${index + 1}. ${escapeHtml(place.name)}</b><small>${escapeHtml(place.county || "Ireland")} · ${escapeHtml(CATS[place.category]?.label || place.category)}${distance}</small><br>${escapeHtml(place.blurb)}${isNew ? ` <b style="display:inline;color:var(--cp-accent)">New county</b>` : ""}</div>`;
+  }).join("");
+  const reply = plannerMessage("assistant",
+    `<b>${constraints.hours}-hour ${escapeHtml(persona.label.toLowerCase())} plan from ${escapeHtml(origin)}</b>` +
+    `<div class="planner-summary"><span class="badge">${escapeHtml(mode)}</span>${constraints.accessible ? `<span class="badge acc-limited">♿ Verify access</span>` : ""}<span class="badge">${plannerPlan.length} stops</span></div>` +
+    stops +
+    `<div class="sug-actions"><button class="qlink show-plan">🗺 Show on map</button><button class="qlink copy-plan">Copy plan</button></div>`);
+  reply.querySelector(".show-plan").addEventListener("click", showPlannerPlanOnMap);
+  reply.querySelector(".copy-plan").addEventListener("click", () => copyText(plannerPlanText(constraints), "Trip plan copied"));
+}
+
+function plannerPlanText(constraints) {
+  const origin = constraints.origin?.label || "my starting point";
+  return `${constraints.hours}-hour Ireland trip from ${origin}\n` + plannerPlan.map((place, index) =>
+    `${index + 1}. ${place.name}, ${place.county}: ${place.blurb}\n${gmapsDir(place, constraints.transport === "transit" ? "transit" : "")}`).join("\n\n") +
+    "\n\nCheck current opening hours, transport schedules and accessibility details before travel.";
+}
+
+function showPlannerPlanOnMap() {
+  if (!plannerPlan.length) return;
+  closeDiscover();
+  plannerLayer.clearLayers();
+  const points = [];
+  if (plannerContext.origin) {
+    points.push([plannerContext.origin.lat, plannerContext.origin.lng]);
+    L.circleMarker(points[0], { radius: 7, color: CUR.accent, fillColor: CUR.accent, fillOpacity: 1, weight: 2 })
+      .bindTooltip(`Start: ${plannerContext.origin.label}`).addTo(plannerLayer);
+  }
+  plannerPlan.forEach((place, index) => {
+    const point = [place.lat, place.lng];
+    points.push(point);
+    L.marker(point, { icon: L.divIcon({
+      className: "", html: `<div class="map-pin"><span>${index + 1}</span></div>`,
+      iconSize: [30, 30], iconAnchor: [15, 30]
+    }) }).bindTooltip(`${index + 1}. ${place.name}`).addTo(plannerLayer);
+  });
+  if (points.length > 1) L.polyline(points, { color: CUR.accent, weight: 3, opacity: 0.8, dashArray: "7 7" }).addTo(plannerLayer);
+  const bounds = L.latLngBounds(points);
+  map.fitBounds(bounds, { padding: [60, 60] });
+  toast(`Showing ${plannerPlan.length} planned stops`);
+}
+
+function submitPlanner(text) {
+  const request = text.trim();
+  if (!request) return;
+  plannerMessage("user", escapeHtml(request));
+  plannerContext = parsePlannerRequest(request);
+  plannerPlan = buildPlannerPlan(plannerContext);
+  if (!plannerContext.origin) {
+    plannerMessage("assistant", "Where would you like to start? Try Dublin, Belfast, Cork, Galway, Limerick or Waterford.");
+    return;
+  }
+  renderPlannerReply(plannerContext);
+}
+
+function initPlanner() {
+  const chat = document.getElementById("plannerChat");
+  if (!chat.childElementCount) plannerMessage("assistant", "Tell me where you are starting, how much time you have, and what you enjoy. You can also ask for public transport or accessible options.");
+}
+
 /* Discover modal */
 let discoverList = [];
+let discoverTrigger = null;
 function openDiscover() {
+  discoverTrigger = document.getElementById("discoverBtn");
   discoverList = suggestionsRanked().slice(0, 6);
   renderDiscover();
+  document.getElementById("discTitle").textContent = "✨ Discover Ireland";
+  document.getElementById("plannerSection").hidden = true;
+  document.getElementById("discoverSection").hidden = false;
+  document.getElementById("aiSection").hidden = false;
   document.getElementById("discModal").classList.add("on");
 }
-function closeDiscover() { document.getElementById("discModal").classList.remove("on"); }
+function openPlanner() {
+  discoverTrigger = document.getElementById("planBtn");
+  initPlanner();
+  document.getElementById("discTitle").textContent = "💬 Plan a trip";
+  document.getElementById("plannerSection").hidden = false;
+  document.getElementById("discoverSection").hidden = true;
+  document.getElementById("aiSection").hidden = true;
+  document.getElementById("discModal").classList.add("on");
+  setTimeout(() => document.getElementById("plannerInput").focus(), 0);
+}
+function closeDiscover() {
+  document.getElementById("discModal").classList.remove("on");
+  discoverTrigger?.focus();
+}
 function renderDiscover() {
   const persona = PERSONAS[state.persona] || PERSONAS.explorer;
   const box = document.getElementById("sugList");
@@ -974,7 +1238,7 @@ function countyAt(lat, lng) {
 
 /* ---------------- State ---------------- */
 let state = { places: [], theme: document.documentElement.getAttribute("data-theme") || "light", persona: "explorer" };
-let filter = { text: "", cats: new Set(), county: null, sort: "recent" };
+let filter = { text: "", cats: new Set(), county: null, province: null, sort: "recent" };
 let addMode = false;
 let editingId = null;
 let markerById = {};
@@ -994,7 +1258,7 @@ function save() {
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
 
 /* ---------------- Map ---------------- */
-let map, tileLayer, geoLayer, markerLayer;
+let map, tileLayer, geoLayer, markerLayer, plannerLayer;
 
 function readThemeVars() {
   const cs = getComputedStyle(document.documentElement);
@@ -1014,7 +1278,7 @@ function fillOpacity(n) {
 function countyStyle(feature) {
   const counts = countyCounts();
   const n = counts[feature.properties.name] || 0;
-  const selected = filter.county === feature.properties.name;
+  const selected = filter.county === feature.properties.name || filter.province === feature.properties.province;
   return {
     color: selected ? CUR.accent : CUR.border,
     weight: selected ? 2.6 : 0.8,
@@ -1054,6 +1318,7 @@ function initMap() {
   }).addTo(map);
 
   markerLayer = L.layerGroup().addTo(map);
+  plannerLayer = L.layerGroup().addTo(map);
   map.fitBounds(geoLayer.getBounds(), { padding: [16, 16] });
   map.setMaxBounds(geoLayer.getBounds().pad(0.6));
 
@@ -1082,12 +1347,12 @@ function buildPopup(place) {
   const stars = place.rating ? "★".repeat(place.rating) + "☆".repeat(5 - place.rating) : "";
   const isTop = topPickId() === place.id;
   const acc = ACCESS[place.access];
-  const dist = geoPos ? haversineKm(geoPos.lat, geoPos.lng, place.lat, place.lng) : null;
+  const proximity = proximityBadge(place);
   const badges = [
     isTop ? `<span class="badge top">⭐ Top pick</span>` : "",
     place.fav ? `<span class="badge fav">❤ Favourite</span>` : "",
     acc ? `<span class="badge ${acc.cls}">${acc.icon} ${acc.label}</span>` : "",
-    dist != null ? `<span class="badge dist">📍 ${fmtDist(dist)} away</span>` : ""
+    proximity
   ].filter(Boolean).join("");
   const media = place.media ? `<a class="qlink" href="${encodeURI(place.media)}" target="_blank" rel="noopener">▶ Photo / video</a>` : "";
   el.innerHTML =
@@ -1160,8 +1425,13 @@ function renderStats() {
   }
 
   const provOrder = ["Leinster", "Munster", "Connacht", "Ulster"];
-  document.getElementById("provBar").innerHTML = provOrder.map(pr =>
-    `<div class="prov-pill ${provinces.has(pr) ? "on" : ""}">${pr}</div>`).join("");
+  const highlightedProvince = filter.province || COUNTY_INFO[filter.county]?.province || null;
+  const provBar = document.getElementById("provBar");
+  provBar.innerHTML = provOrder.map(pr =>
+    `<button type="button" class="prov-pill ${provinces.has(pr) ? "on" : ""} ${highlightedProvince === pr ? "selected" : ""}" data-province="${pr}" aria-pressed="${filter.province === pr}" title="${filter.county && highlightedProvince === pr ? `${filter.county} is in ${pr}` : `Filter places in ${pr}`}">${pr}</button>`).join("");
+  provBar.querySelectorAll(".prov-pill").forEach(button => button.addEventListener("click", () => {
+    selectProvince(filter.province === button.dataset.province ? null : button.dataset.province);
+  }));
 
   document.getElementById("footNote").textContent = total ? `${total} saved locally` : "";
 }
@@ -1187,6 +1457,7 @@ function renderChips() {
 function filteredPlaces() {
   let list = state.places.slice();
   if (filter.county) list = list.filter(p => p.county === filter.county);
+  if (filter.province) list = list.filter(p => (COUNTY_INFO[p.county]?.province || p.province) === filter.province);
   if (filter.cats.size) list = list.filter(p => filter.cats.has(p.category));
   if (filter.text) {
     const t = filter.text.toLowerCase();
@@ -1194,7 +1465,12 @@ function filteredPlaces() {
   }
   const s = filter.sort;
   list.sort((a, b) => {
-    if (s === "near" && geoPos) return haversineKm(geoPos.lat, geoPos.lng, a.lat, a.lng) - haversineKm(geoPos.lat, geoPos.lng, b.lat, b.lng);
+    if (s === "near" && geoPos) {
+      const aTravel = travelById.get(a.id)?.duration;
+      const bTravel = travelById.get(b.id)?.duration;
+      if (!travelLoading && (Number.isFinite(aTravel) || Number.isFinite(bTravel))) return (aTravel ?? Infinity) - (bTravel ?? Infinity);
+      return haversineKm(geoPos.lat, geoPos.lng, a.lat, a.lng) - haversineKm(geoPos.lat, geoPos.lng, b.lat, b.lng);
+    }
     if (s === "name") return a.name.localeCompare(b.name);
     if (s === "rating") return (b.rating || 0) - (a.rating || 0);
     if (s === "county") return (a.county || "").localeCompare(b.county || "");
@@ -1211,6 +1487,7 @@ function renderList() {
 
   const flag = document.getElementById("countyFlag");
   if (filter.county) { flag.classList.add("on"); document.getElementById("countyFlagText").textContent = `County: ${filter.county}`; }
+  else if (filter.province) { flag.classList.add("on"); document.getElementById("countyFlagText").textContent = `Province: ${filter.province}`; }
   else flag.classList.remove("on");
 
   if (state.places.length === 0) {
@@ -1228,9 +1505,9 @@ function renderList() {
   if (list.length === 0) {
     box.innerHTML = `<div class="empty"><div class="big">🔍</div><h3>No matches</h3><p>Nothing fits your current filters.</p><button class="btn btn-ghost" id="emptyClear">Clear filters</button></div>`;
     document.getElementById("emptyClear").addEventListener("click", () => {
-      filter.text = ""; filter.cats.clear(); filter.county = null;
+      filter.text = ""; filter.cats.clear(); filter.county = null; filter.province = null;
       document.getElementById("filterInput").value = "";
-      renderChips(); renderList(); refreshChoropleth();
+      renderStats(); renderChips(); renderList(); refreshChoropleth();
     });
     return;
   }
@@ -1244,12 +1521,12 @@ function renderList() {
     card.className = "place-card";
     const stars = p.rating ? `<span class="stars">${"★".repeat(p.rating)}</span>` : "";
     const acc = ACCESS[p.access];
-    const dist = geoPos ? haversineKm(geoPos.lat, geoPos.lng, p.lat, p.lng) : null;
+    const proximity = proximityBadge(p);
     card.innerHTML =
       `<div class="place-emoji">${cat.emoji}</div>
        <div class="place-body">
          <div class="pt"><span>${escapeHtml(p.name)}</span>${p.id === topId ? `<span class="top-star" title="Your top pick">⭐</span>` : ""}</div>
-         <div class="place-meta"><span>📍 ${p.county ? escapeHtml(p.county) : "—"}</span>${p.date ? `<span>${fmtDate(p.date)}</span>` : ""}${stars}${acc ? `<span class="badge ${acc.cls}" title="${acc.label}">${acc.icon}</span>` : ""}${dist != null ? `<span class="badge dist">${fmtDist(dist)}</span>` : ""}</div>
+         <div class="place-meta"><span>📍 ${p.county ? escapeHtml(p.county) : "—"}</span>${p.date ? `<span>${fmtDate(p.date)}</span>` : ""}${stars}${acc ? `<span class="badge ${acc.cls}" title="${acc.label}">${acc.icon}</span>` : ""}${proximity}</div>
          ${p.notes ? `<div class="place-notes">${escapeHtml(p.notes)}</div>` : ""}
          <div class="qlinks">
            <a class="qlink" href="${gmapsDir(p)}" target="_blank" rel="noopener">🧭 Directions</a>
@@ -1291,10 +1568,25 @@ function renderAll(focusId) {
 /* ---------------- Actions ---------------- */
 function selectCounty(name) {
   filter.county = name;
-  renderList(); refreshChoropleth();
+  filter.province = null;
+  renderStats(); renderList(); refreshChoropleth();
   if (name) {
     let bounds = null;
     geoLayer.eachLayer(l => { if (l.feature.properties.name === name) bounds = l.getBounds(); });
+    if (bounds) map.flyToBounds(bounds, { padding: [40, 40], duration: 0.6 });
+    if (document.body.classList.contains("view-list")) setView("map");
+  }
+}
+function selectProvince(name) {
+  filter.province = name;
+  filter.county = null;
+  renderStats(); renderList(); refreshChoropleth();
+  if (name) {
+    let bounds = null;
+    geoLayer.eachLayer(layer => {
+      if (layer.feature.properties.province !== name) return;
+      bounds = bounds ? bounds.extend(layer.getBounds()) : layer.getBounds();
+    });
     if (bounds) map.flyToBounds(bounds, { padding: [40, 40], duration: 0.6 });
     if (document.body.classList.contains("view-list")) setView("map");
   }
@@ -1310,6 +1602,7 @@ function removePlace(id) {
   const p = state.places.find(x => x.id === id); if (!p) return;
   if (!confirm(`Delete "${p.name}"?`)) return;
   state.places = state.places.filter(x => x.id !== id);
+  travelById.delete(id);
   save(); renderAll();
   toast("Place removed");
 }
@@ -1432,6 +1725,7 @@ function saveModal() {
   const newCounty = (rec.county && !before.has(rec.county)) ? rec.county : null;
   closeModal();
   renderAll(editingId ? null : rec.id);
+  if (geoPos) updateTravelTimes();
   if (!editingId) {
     focusPlace(rec.id);
     if (newCounty) {
@@ -1513,7 +1807,9 @@ function importData(file) {
         media: p.media || "", fav: !!p.fav,
         lat: +p.lat, lng: +p.lng, createdAt: p.createdAt || Date.now()
       })).filter(p => !isNaN(p.lat) && !isNaN(p.lng));
+      travelById = new Map();
       save(); renderAll();
+      if (geoPos) updateTravelTimes();
       toast(`Imported ${state.places.length} places`);
     } catch (e) { toast("Could not read that file"); }
   };
@@ -1527,6 +1823,7 @@ function loadSamples() {
   });
   state.places.forEach(p => { if (!p.province && p.county) p.province = COUNTY_INFO[p.county]?.province; });
   save(); renderAll();
+  if (geoPos) updateTravelTimes();
   toast("Loaded sample places ☘️", true);
 }
 
@@ -1556,9 +1853,19 @@ function boot() {
 
   document.getElementById("addBtn").addEventListener("click", startAdd);
   document.getElementById("discoverBtn").addEventListener("click", openDiscover);
+  document.getElementById("planBtn").addEventListener("click", openPlanner);
   document.getElementById("discClose").addEventListener("click", closeDiscover);
   document.getElementById("discModal").addEventListener("click", (e) => { if (e.target.id === "discModal") closeDiscover(); });
   document.getElementById("sugShuffle").addEventListener("click", () => { discoverList = suggestionsRanked().slice(0, 6); renderDiscover(); });
+  document.getElementById("plannerForm").addEventListener("submit", (event) => {
+    event.preventDefault();
+    const input = document.getElementById("plannerInput");
+    submitPlanner(input.value); input.value = "";
+  });
+  document.querySelectorAll(".planner-example").forEach(button => button.addEventListener("click", () => {
+    document.getElementById("plannerInput").value = button.textContent;
+    document.getElementById("plannerInput").focus();
+  }));
   document.getElementById("aiCopy").addEventListener("click", () => copyText(document.getElementById("aiBox").value, "AI prompt copied — paste it into your assistant"));
   document.getElementById("locateBtn").addEventListener("click", toggleLocation);
   document.getElementById("favToggle").addEventListener("click", () => { modalFav = !modalFav; paintFav(); });
@@ -1582,10 +1889,14 @@ function boot() {
   document.getElementById("filterInput").addEventListener("input", (e) => { filter.text = e.target.value; renderList(); });
   document.getElementById("sortSel").addEventListener("change", (e) => {
     filter.sort = e.target.value;
-    if (e.target.value === "near" && !geoPos) requestLocation(() => renderList());
+    if (e.target.value === "near" && !geoPos) { requestLocation(); return; }
     renderList();
   });
-  document.getElementById("clearCounty").addEventListener("click", () => selectCounty(null));
+  document.getElementById("clearCounty").title = "Clear location filter";
+  document.getElementById("clearCounty").addEventListener("click", () => {
+    filter.county = null; filter.province = null;
+    renderStats(); renderList(); refreshChoropleth();
+  });
 
   const gi = document.getElementById("geoInput");
   gi.addEventListener("input", (e) => { clearTimeout(geoTimer); const q = e.target.value; geoTimer = setTimeout(() => runGeocode(q), 450); });
