@@ -1438,11 +1438,8 @@ function renderStats() {
 
 function renderChips() {
   const box = document.getElementById("chips");
-  const used = new Set(state.places.map(p => p.category));
   let html = `<button class="chip ${filter.cats.size === 0 ? "on" : ""}" data-cat="__all">All</button>`;
   Object.entries(CATS).forEach(([k, v]) => {
-    if (!used.has(k) && filter.cats.size === 0) return;
-    if (!used.has(k) && !filter.cats.has(k)) return;
     html += `<button class="chip ${filter.cats.has(k) ? "on" : ""}" data-cat="${k}">${v.emoji} ${v.label}</button>`;
   });
   box.innerHTML = html;
